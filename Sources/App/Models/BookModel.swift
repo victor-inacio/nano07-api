@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import Vapor
 import Fluent
 
-final class Book : Model{
+final class Book : Model,Content, @unchecked Sendable{
     static let schema = "books"
     
     @ID(key: .id)
@@ -21,11 +22,12 @@ final class Book : Model{
     var author : String
     
 
-    init(){}
+    init(){ }
     
-    init(id: UUID? = nil, name: String) {
+    init(id: UUID? = nil, name: String, author: String) {
         self.id = id
         self.name = name
+        self.author = author
     }
     
 }

@@ -14,6 +14,9 @@
 #
 x-shared_environment: &shared_environment
   LOG_LEVEL: ${LOG_LEVEL:-debug}
+  MYSQL_DATABASE: ${MYSQL_DATABASE}
+  MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  MYSQL_USER: ${MYSQL_USER}
   
 services:
   app:
@@ -30,9 +33,9 @@ services:
     image: mysql/mysql-server:latest
     container_name: mysql_bookDB
     environment:
-      - MYSQL_DATABASE=bookDB
-      - MYSQL_ROOT_PASSWORD=mysqlPW
-      - MYSQL_USER=root
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
     ports:
       - '3306:3306'
     volumes:

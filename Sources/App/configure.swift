@@ -19,5 +19,8 @@ public func configure(_ app: Application) async throws {
     ),as: .mysql)
     
     app.migrations.add(CreateBook())
+    try await app.autoMigrate()
+    
+    //Register routes
     try routes(app)
 }
