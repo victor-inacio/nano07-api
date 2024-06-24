@@ -29,13 +29,24 @@ services:
       - '8080:8080'
     # user: '0' # uncomment to run as root for testing purposes even though Dockerfile defines 'vapor' user.
     command: ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "8080"]
-  db:
+  db_production:
     image: mysql/mysql-server:latest
     container_name: mysql_bookDB
     environment:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=${MYSQL_USER}
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-volume:/var/lib/mysql
+  db_testing:
+    image: mysql/mysql-server:latest
+    container_name: mysql_bookDB
+    environment:
+      - MYSQL_DATABASE=testDB
+      - MYSQL_ROOT_PASSWORD=mysqlPW
+      - MYSQL_USER=root
     ports:
       - '3306:3306'
     volumes:

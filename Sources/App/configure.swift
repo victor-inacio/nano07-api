@@ -10,13 +10,26 @@ public func configure(_ app: Application) async throws {
     var tls = TLSConfiguration.makeClientConfiguration()
     tls.certificateVerification = .none
     
-    app.databases.use(.mysql(
-        hostname: "localhost", 
-        username: "root", 
-        password: "mysqlPW", 
-        database: "bookDB",
-        tlsConfiguration: tls
-    ),as: .mysql)
+    //CHECK IF ENVIROMENT IS IN PRODUCTION OR TESTING
+    if (app.environment == .testing) {
+        app.databases.use(.mysql(
+            hostname: "localhost",
+            username: "root",
+            password: "mysqlPW",
+            database: "testDB",
+            tlsConfiguration: tls
+        ),as: .mysql)
+    } else {
+        app.databases.use(.mysql(
+            hostname: "localhost",
+            username: "root",
+            password: "mysqlPW",
+            database: "bookDB",
+            tlsConfiguration: tls
+        ),as: .mysql)
+    }
+    
+   
     
     app.migrations.add(CreateBook())
     try await app.autoMigrate()
