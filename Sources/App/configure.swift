@@ -4,7 +4,7 @@ import FluentMySQLDriver
 import FluentSQLiteDriver
 
 // configures your application
-public func configure(_ app: Application) async throws {
+public func configure(_ app: Application) throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     // register routes
@@ -24,7 +24,9 @@ public func configure(_ app: Application) async throws {
     }
     
     app.migrations.add(CreateBook())
-    try await app.autoMigrate()
+    try app.autoRevert().wait()
+    try app.autoMigrate().wait()
+   
     
     //Register routes
     try routes(app)
