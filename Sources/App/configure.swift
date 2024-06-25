@@ -1,6 +1,7 @@
 import Vapor
 import Fluent
 import FluentMySQLDriver
+import FluentSQLiteDriver
 
 // configures your application
 public func configure(_ app: Application) async throws {
@@ -10,26 +11,17 @@ public func configure(_ app: Application) async throws {
     var tls = TLSConfiguration.makeClientConfiguration()
     tls.certificateVerification = .none
     
-    //CHECK IF ENVIROMENT IS IN PRODUCTION OR TESTING
     if (app.environment == .testing) {
-        app.databases.use(.mysql(
-            hostname: "localhost",
-            username: "root",
-            password: "mysqlPW",
-            database: "testDB",
-            tlsConfiguration: tls
-        ),as: .mysql)
+        app.databases.use(.sqlite(.file("db.sqlite")), as: .sqlite)
     } else {
         app.databases.use(.mysql(
-            hostname: "localhost",
+            hostname: "mysql_bookDB",
             username: "root",
             password: "mysqlPW",
             database: "bookDB",
             tlsConfiguration: tls
         ),as: .mysql)
     }
-    
-   
     
     app.migrations.add(CreateBook())
     try await app.autoMigrate()
