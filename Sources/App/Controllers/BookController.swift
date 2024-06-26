@@ -27,12 +27,21 @@ struct BookController : RouteCollection{
         
         //Individual operations using id as a parameter
         books.group(":id") { book in
+            book.get(use: byID)
             book.put(use: update)
             book.delete(use: delete)
         }
     }
     
     //MARK: CRUD OPERATIONS IMPLEMENTATIONS
+    
+    @Sendable func byID(req: Request) async throws -> Book {
+        guard let book = try await Book.find(req.parameters.get("id"), on: req.db) else {
+            throw Abort(.notFound)
+        }
+        
+        return book
+    }
     
     //RETURN ALL BOOKS
     @Sendable func index(req: Request) async throws -> [Book] {
