@@ -15,7 +15,7 @@ public func configure(_ app: Application) throws {
         app.databases.use(.sqlite(.file("db.sqlite")), as: .sqlite)
     } else {
         app.databases.use(.mysql(
-            hostname: "localhost",
+            hostname: "mysql_bookDB",
             username: "root",
             password: "mysqlPW",
             database: "bookDB",
@@ -23,6 +23,7 @@ public func configure(_ app: Application) throws {
         ),as: .mysql)
     }
     
+    app.migrations.add(CreateUser())
     app.migrations.add(CreateBook())
     
     try app.autoMigrate().wait()

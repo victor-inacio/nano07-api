@@ -40,17 +40,6 @@ services:
       - '3306:3306'
     volumes:
       - mysql-volume:/var/lib/mysql
-  db_testing:
-    image: mysql/mysql-server:latest
-    container_name: mysql_bookDB
-    environment:
-      - MYSQL_DATABASE=testDB
-      - MYSQL_ROOT_PASSWORD=mysqlPW
-      - MYSQL_USER=root
-    ports:
-      - '3306:3306'
-    volumes:
-      - mysql-volume:/var/lib/mysql
 volumes:
   mysql-volume:
     driver: local
