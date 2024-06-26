@@ -5,31 +5,38 @@ import XCTVapor
 
 final class AppTests: XCTestCase {
     var app: Application!
-
+    
     override func setUpWithError() throws {
         self.app = Application(.testing)
         
         try configure(app)
+        
+        try self.app.autoRevert().wait()
+        try? self.app.autoMigrate().wait()
     }
     
     override func tearDownWithError() throws {
-        try self.app.autoRevert().wait()
-        try? self.app.autoMigrate().wait()
+        
+        
         self.app.shutdown()
         self.app = nil
     }
     
     //Test index endpoint funcrion
     func testIndexEndpoint() throws {
-        let book: Book = .init(id: nil, name: "Foo_Book", author: "Foo_Author")
+        let book: Book = .init(name: "Foo_Book", author: "Foo_Author")
         
         try book.save(on: app.db).wait()
         
         try app.test(.GET, "/books") { res in
             XCTAssertEqual(res.status, .ok)
             
+            
+            
             let returned_books = try res.content.decode([Book].self)
             let retBook = returned_books[0]
+            
+            XCTAssertEqual(returned_books.count, 1)
             
             XCTAssertNotNil(retBook.id)
             XCTAssertEqual("Foo_Book", retBook.name)
@@ -179,5 +186,34 @@ final class AppTests: XCTestCase {
         }, afterResponse: { res in
             XCTAssertEqual(res.status, .notFound)
         })
+    }
+    
+    func testGetBookByIDUsingValidParams() throws {
+        
+        let book = Book(name: "Test_Book", author: "Test_Authors")
+        
+        try book.save(on: app.db).wait()
+        
+        let bookID = book.id!
+        
+        try app.test(.GET, "books/\(bookID)") { res in
+            
+            XCTAssertEqual(res.status, .ok)
+            
+            
+            let returnedBook = try res.content.decode(Book.self)
+            
+            XCTAssertEqual(returnedBook.id, bookID)
+            
+            XCTAssertEqual(returnedBook.name, book.name)
+            XCTAssertEqual(returnedBook.author, book.author)
+        }
+        
+    }
+    
+    func testGetBookByIDUsingInvalidID() throws {
+        try app.test(.GET, "book/13123213") { res in
+            XCTAssertEqual(res.status, .notFound)
+        }
     }
 }
