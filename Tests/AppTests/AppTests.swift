@@ -13,6 +13,8 @@ final class AppTests: XCTestCase {
     }
     
     override func tearDownWithError() throws {
+        try self.app.autoRevert().wait()
+        try? self.app.autoMigrate().wait()
         self.app.shutdown()
         self.app = nil
     }
