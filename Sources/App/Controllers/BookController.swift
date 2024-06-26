@@ -8,6 +8,16 @@ import Fluent
 import Vapor
 import Foundation
 
+struct BookPostRequest: Content {
+    let name: String
+    let author: String
+}
+
+struct BookPutRequest: Content {
+    let name: String?
+    let author: String?
+}
+
 struct BookController : RouteCollection{
     //MARK: CONFIGURE ROUTES
     func boot(routes: any Vapor.RoutesBuilder) throws {
@@ -16,9 +26,9 @@ struct BookController : RouteCollection{
         books.post(use: create)
         
         //Individual operations using id as a parameter
-        books.group(":id") { todo in
-            books.put(use: update)
-            books.delete(use: delete)
+        books.group(":id") { book in
+            book.put(use: update)
+            book.delete(use: delete)
         }
     }
     
@@ -31,9 +41,13 @@ struct BookController : RouteCollection{
     
     //REATE A NEW BOOK
     @Sendable func create(req: Request) async throws -> Book {
-        let todo = try req.content.decode(Book.self)
-        try await todo.save(on: req.db)
-        return todo
+    
+        let bookReq = try req.content.decode(BookPostRequest.self)
+        
+        let createdBook = Book(name: bookReq.name, author: bookReq.author)
+        try await createdBook.save(on: req.db)
+        
+        return createdBook
     }
 
     //RETURN SPECIFIC BOOK BY ID
@@ -64,6 +78,7 @@ struct BookController : RouteCollection{
         guard let book = try await Book.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
         }
+        
         try await book.delete(on: req.db)
         return .ok
     }
