@@ -74,9 +74,9 @@ struct BookController : RouteCollection{
             throw Abort(.notFound)
         }
         
-        let updatedBook = try req.content.decode(Book.self)
-        book.name = updatedBook.name
-        book.author = updatedBook.author
+        let updatedBook = try req.content.decode(BookPutRequest.self)
+        book.name = updatedBook.name ?? book.name
+        book.author = updatedBook.author ?? book.author
         try await book.save(on: req.db)
         
         return book
