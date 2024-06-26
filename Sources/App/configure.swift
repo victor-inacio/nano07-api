@@ -24,7 +24,6 @@ public func configure(_ app: Application) throws {
     }
     
     app.migrations.add(CreateBook())
-    try app.autoRevert().wait()
     try app.autoMigrate().wait()
    
     
