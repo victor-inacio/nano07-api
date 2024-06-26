@@ -9,16 +9,9 @@ import Foundation
 import Vapor
 
 
-final class AuthMiddleware: Middleware {
-    func respond(to request: Request, chainingTo next: Responder) -> EventLoopFuture<Response> {
-        // Add your middleware logic here
-        print("Request received: \(request)")
-        
-        // Call the next responder in the chain
-        return next.respond(to: request).map { response in
-            // Add any response modifications here
-            print("Response sent: \(response)")
-            return response
-        }
-    }
-}
+//final class AuthMiddleware: Middleware {
+//    func respond(to request: Vapor.Request, chainingTo next: any Vapor.Responder) -> NIOCore.EventLoopFuture<Vapor.Response> {
+//        
+//    }
+//    
+//}

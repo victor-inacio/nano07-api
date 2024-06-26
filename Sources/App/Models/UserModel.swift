@@ -15,10 +15,10 @@ final class User : Model, Content, @unchecked Sendable{
     @ID(key: .id)
     var id: UUID?
      
-    @Field(key: "email")
+    @Field(key: "USER_EMAIL")
     var email: String
      
-    @Field(key: "password")
+    @Field(key: "USER_PASSWORD")
     var password: String
      
     init() { }

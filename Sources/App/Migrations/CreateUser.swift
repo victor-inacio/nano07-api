@@ -12,13 +12,13 @@ struct CreateUser : AsyncMigration {
     func prepare(on database: any FluentKit.Database) async throws {
         try await database.schema(User.schema)
             .id()
-            .field("email", .string, .required)
-            .field("password", .string, .required)
-            .unique(on: "email")
+            .field("USER_EMAIL", .string, .required)
+            .field("USER_PASSWORD", .string, .required)
+            .unique(on: "USER_EMAIL")
             .create()
     }
     
-    func revert(on database: FluentKit.Database) async throws {
+    func revert(on database: Database) async throws {
         try await database.schema(User.schema)
             .delete()
     }
