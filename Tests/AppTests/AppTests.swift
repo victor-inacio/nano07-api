@@ -22,13 +22,41 @@ final class AppTests: XCTestCase {
         self.app = nil
     }
     
+    func testFailsWhenNotAuthenticated() throws {
+        
+        struct ProtecRoute {
+            let route: String
+            let method: HTTPMethod
+        }
+        
+        let protectedRoutes: [ProtecRoute] = [
+            .init(route: "books", method: .GET),
+            .init(route: "books/123", method: .GET),
+            .init(route: "books", method: .POST),
+            .init(route: "books/123", method: .PUT),
+            .init(route: "books/123", method: .DELETE)
+        ]
+        
+        for route in protectedRoutes {
+            try app.test(route.method, route.route) { res in
+                XCTAssertEqual(res.status, .unauthorized)
+            }
+        }
+        
+    }
+    
     //Test index endpoint funcrion
     func testIndexEndpoint() throws {
         let book: Book = .init(name: "Foo_Book", author: "Foo_Author")
         
         try book.save(on: app.db).wait()
         
-        try app.test(.GET, "/books") { res in
+        try app.test(.GET, "/books", beforeRequest: {
+            req in
+            
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
+            
+        }) { res in
             XCTAssertEqual(res.status, .ok)
             
             
@@ -53,6 +81,8 @@ final class AppTests: XCTestCase {
         
         try app.test(.POST, "books", beforeRequest: {
             req in
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
+            
             try req.content.encode([
                 "name": name,
                 "author": author
@@ -76,6 +106,8 @@ final class AppTests: XCTestCase {
         
         try app.test(.POST, "books", beforeRequest: {
             req in
+            
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
             try req.content.encode([
                 "author": author
             ])
@@ -94,6 +126,7 @@ final class AppTests: XCTestCase {
         
         try app.test(.POST, "books", beforeRequest: {
             req in
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
             try req.content.encode([
                 "name": name
             ])
@@ -108,8 +141,11 @@ final class AppTests: XCTestCase {
     func testCreateBookFailWhenNoContent() throws {
         
         
-        try app.test(.POST, "books") { res in
-        
+        try app.test(.POST, "books", beforeRequest: {
+            req in
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
+        }) { res in
+            
             XCTAssertNotEqual(res.status, .ok)
             
         }
@@ -121,7 +157,11 @@ final class AppTests: XCTestCase {
         let book = Book(name: "Test_Name", author: "Test_Author")
         try book.save(on: app.db).wait()
         
-        try app.test(.DELETE, "books/\(book.id!)") { res in
+        try app.test(.DELETE, "books/\(book.id!)", beforeRequest: {
+            req in
+            
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
+        }) { res in
             
             XCTAssertEqual(res.status, .ok)
             
@@ -131,7 +171,10 @@ final class AppTests: XCTestCase {
     
     func testDeleteBookUsingInvalidID() throws {
         
-        try app.test(.DELETE, "books/123565453453") { res in
+        try app.test(.DELETE, "books/123565453453", beforeRequest: {
+            req in
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
+        }) { res in
             
             XCTAssertEqual(res.status, .notFound)
             
@@ -155,7 +198,7 @@ final class AppTests: XCTestCase {
         
         try app.test(.PUT, "books/\(bookID)", beforeRequest: {
             req in
-            
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
             try req.content.encode([
                 "name": "newName",
                 "author": "newAuthor",
@@ -177,7 +220,7 @@ final class AppTests: XCTestCase {
         
         try app.test(.PUT, "books/123542", beforeRequest: {
             req in
-            
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
             try req.content.encode([
                 "name": "newName",
                 "author": "newAuthor",
@@ -196,7 +239,10 @@ final class AppTests: XCTestCase {
         
         let bookID = book.id!
         
-        try app.test(.GET, "books/\(bookID)") { res in
+        try app.test(.GET, "books/\(bookID)", beforeRequest: {
+            req in
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
+        }) { res in
             
             XCTAssertEqual(res.status, .ok)
             
@@ -212,7 +258,10 @@ final class AppTests: XCTestCase {
     }
     
     func testGetBookByIDUsingInvalidID() throws {
-        try app.test(.GET, "book/13123213") { res in
+        try app.test(.GET, "book/13123213", beforeRequest: {
+            req in
+            req.headers.basicAuthorization = .init(username: "user@gmail.com", password: "123")
+        }) { res in
             XCTAssertEqual(res.status, .notFound)
         }
     }
