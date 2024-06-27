@@ -18,11 +18,11 @@ struct UserController: RouteCollection {
     // MARK: CRUD OPERATIONS
     
     //CREATE NEW USER
-    @Sendable func create(_ req: Request) throws -> EventLoopFuture<User> {
+    @Sendable func create(_ req: Request) throws -> EventLoopFuture<User.Public> {
         let user = try req.content.decode(User.self)
         user.password = try Bcrypt.hash(user.password)
         return user.save(on: req.db).map {
-            user
+            user.convertToPublic()
         }
     }
 }

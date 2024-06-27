@@ -22,11 +22,15 @@ struct BookController : RouteCollection{
     //MARK: CONFIGURE ROUTES
     func boot(routes: any Vapor.RoutesBuilder) throws {
         let books = routes.grouped("books")
-        books.get(use: index)
-        books.post(use: create)
+        let basicAuthMiddleware = User.authenticator()
+        let guardAuthMiddleware = User.guardMiddleware()
+        let basicAuthGroup = books.grouped(basicAuthMiddleware, guardAuthMiddleware)
+        
+        basicAuthGroup.get(use: index)
+        basicAuthGroup.post(use: create)
         
         //Individual operations using id as a parameter
-        books.group(":id") { book in
+        basicAuthGroup.group(":id") { book in
             book.get(use: byID)
             book.put(use: update)
             book.delete(use: delete)

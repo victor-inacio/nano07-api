@@ -11,6 +11,7 @@ public func configure(_ app: Application) throws {
     var tls = TLSConfiguration.makeClientConfiguration()
     tls.certificateVerification = .none
     
+    //Checks enviroment to log on different DBs
     if (app.environment == .testing) {
         app.databases.use(.sqlite(.file("db.sqlite")), as: .sqlite)
     } else {
@@ -23,11 +24,12 @@ public func configure(_ app: Application) throws {
         ),as: .mysql)
     }
     
+    //Add migrations to the application
     app.migrations.add(CreateUser())
     app.migrations.add(CreateBook())
     
+    //Runs the migrate function
     try app.autoMigrate().wait()
-   
     
     
     //Register routes
