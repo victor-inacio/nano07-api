@@ -7,6 +7,7 @@
 
 import Foundation
 import Fluent
+import Vapor
 
 struct CreateUser : AsyncMigration {
     func prepare(on database: any FluentKit.Database) async throws {
@@ -16,6 +17,9 @@ struct CreateUser : AsyncMigration {
             .field("USER_PASSWORD", .string, .required)
             .unique(on: "USER_EMAIL")
             .create()
+        
+        let user = User(email: "user@gmail.com", password: try Bcrypt.hash("123"))
+        try await user.save(on: database)
     }
     
     func revert(on database: Database) async throws {

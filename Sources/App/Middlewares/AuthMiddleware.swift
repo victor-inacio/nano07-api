@@ -12,6 +12,9 @@ import Fluent
 
 final class UserAuthenticator : AsyncBasicAuthenticator, Middleware {
     func authenticate(basic: Vapor.BasicAuthorization, for request: Vapor.Request) async throws {
+        
+        
+        
         guard let user = try await User.query(on: request.db)
             .filter(\.$email == basic.username)
             .first() else {

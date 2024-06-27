@@ -16,7 +16,7 @@ public func configure(_ app: Application) throws {
         app.databases.use(.sqlite(.file("db.sqlite")), as: .sqlite)
     } else {
         app.databases.use(.mysql(
-            hostname: "mysql_bookDB",
+            hostname: "localhost",
             username: "root",
             password: "mysqlPW",
             database: "bookDB",
